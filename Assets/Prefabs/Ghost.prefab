@@ -265,6 +265,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d83ec69eb564c8f4a8cca9d403a28c44, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  behaviorScript: {fileID: 0}
+  target: {x: 0, y: 0, z: 0}
+  cylinder: {fileID: 1375541625153293231}
+  cube: {fileID: 6923101038248404597}
+  normalColor: {r: 0, g: 0, b: 0, a: 0}
+  frightenedColor: {r: 0, g: 0, b: 0.5019608, a: 0}
 --- !u!114 &2245034844189510488
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -283,6 +289,9 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 512
+  ghostDoorLayer:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &4418992489176839509
 GameObject:
   m_ObjectHideFlags: 0

@@ -104,6 +104,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8013599969249765396, guid: eaa84b033f4af544ebee7597a7a3a8fe, type: 3}
+      propertyPath: normalColor.r
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -133,6 +137,12 @@ MonoBehaviour:
   obstacleLayer:
     serializedVersion: 2
     m_Bits: 512
+  ghostDoorLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  ghostLayer:
+    serializedVersion: 2
+    m_Bits: 0
   scatterTransform: {fileID: 0}
   homeTransform: {fileID: 0}
   homeExitTransform: {fileID: 0}

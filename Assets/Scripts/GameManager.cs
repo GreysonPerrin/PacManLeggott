@@ -1,9 +1,9 @@
 //////////////////////////////////////////////
 //Assignment/Lab/Project: 3D PacMan
-//Name: Shelby Leggott
+//Name: Shelby Leggott, Greyson Perrin
 //Section: SGD285.4171
 //Instructor: Aurore Locklear
-//Date: 01/21/2024
+//Date: 01/28/2024
 /////////////////////////////////////////////
 
 // GameManager Script: For managing general gameplay loop mechanics
@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public Ghost[] ghosts;
     public Pacman pacman;
     public Transform[] pellets;
+    public Transform[] powerPellets;
 
     // can access these variables but cannot set the score in game, will be done automatically
     public int score { get; private set; }
@@ -125,6 +126,10 @@ public class GameManager : MonoBehaviour
             pellet.gameObject.SetActive(true);
             pelletsInScene++;
         }
+        foreach (Transform powerPellet in powerPellets)
+        {
+            powerPellet.gameObject.SetActive(true);
+        }
         levelCounter++; // increment the level counter starting at 1 by default
         livesLostOnRound = 0;
         behaviorSwapCount = 0;
@@ -193,6 +198,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // Handles the event that occurs when a ghost is eaten
+    public void GhostEaten(Ghost ghost)
+    {
+        ghost.movement.ResetGameobjectState();
+
+        ghost.cylinder.GetComponent<Renderer>().material.color = ghost.normalColor;
+        ghost.cube.GetComponent<Renderer>().material.color = ghost.normalColor;
+    }
+
     // Handles the event that occurs when a pellet is eaten
     public void PelletEaten(Pellet pellet)
     {
@@ -219,6 +233,30 @@ public class GameManager : MonoBehaviour
             pacman.gameObject.SetActive(false); // disable pacman so he cannot be killed after winning the game
             Invoke(nameof(NewRound), 2.0f);
         }
+    }
+
+    // Handles the event that occurs when a power pellet is eaten
+    public void PowerPelletEaten(PowerPellet powerPellet)
+    {
+        powerPellet.gameObject.SetActive(false);
+
+        // swap all ghosts to frightened mode
+        for (int i = 0; i < ghosts.Length; i++)
+        {
+            // only swap ghosts that are currently in scatter or chase mode
+            if (ghosts[i].behaviorScript.currentBehavior != GhostBehavior.CurrentBehavior.Home && ghosts[i].behaviorScript.currentBehavior != GhostBehavior.CurrentBehavior.LeavingHome)
+            {
+                // change behavior mode
+                ghosts[i].behaviorScript.currentBehavior = GhostBehavior.CurrentBehavior.Frightened;
+                //change color
+                ghosts[i].cylinder.GetComponent<Renderer>().material.color = ghosts[i].frightenedColor;
+                ghosts[i].cube.GetComponent<Renderer>().material.color = ghosts[i].frightenedColor;
+            }
+        }
+
+        StopCoroutine(ChaseToScatter());
+        StopCoroutine(ScatterToChase());
+        Invoke("FrightenedToScatter", powerPellet.timeLimit);
     }
 
     // returns a bool that checks if any pellets are still in the scene
@@ -289,6 +327,25 @@ public class GameManager : MonoBehaviour
 
         // increment behavior swap count
         behaviorSwapCount++;
+        StartCoroutine(ScatterToChase());
+    }
+
+    // function for when the power pellet effect ends
+    private void FrightenedToScatter()
+    {
+        for (int i = 0; i < ghosts.Length; i++)
+        {
+            // only swap ghosts that are currently in frightened mode
+            if (ghosts[i].behaviorScript.currentBehavior != GhostBehavior.CurrentBehavior.Home && ghosts[i].behaviorScript.currentBehavior != GhostBehavior.CurrentBehavior.LeavingHome)
+            {
+                // change behavior mode
+                ghosts[i].behaviorScript.currentBehavior = GhostBehavior.CurrentBehavior.Scatter;
+                //change color
+                ghosts[i].cylinder.GetComponent<Renderer>().material.color = ghosts[i].normalColor;
+                ghosts[i].cube.GetComponent<Renderer>().material.color = ghosts[i].normalColor;
+            }
+        }
+
         StartCoroutine(ScatterToChase());
     }
 }

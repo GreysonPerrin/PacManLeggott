@@ -1,9 +1,9 @@
 //////////////////////////////////////////////
 //Assignment/Lab/Project: 3D PacMan
-//Name: Shelby Leggott
+//Name: Shelby Leggott, Greyson Perrin
 //Section: SGD285.4171
 //Instructor: Aurore Locklear
-//Date: 01/21/2024
+//Date: 01/28/2024
 /////////////////////////////////////////////
 
 // Ghost Script: Manages the script references for ghost behavior, state, and movement
@@ -18,6 +18,11 @@ public class Ghost : MonoBehaviour
     public GhostBehavior behaviorScript;
 
     public Vector3 target; // target will vary between pacman and a scatter target
+
+    public GameObject cylinder;
+    public GameObject cube;
+    public Color normalColor;
+    public Color frightenedColor;
 
     private void Awake()
     {
@@ -44,7 +49,14 @@ public class Ghost : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer("Pacman"))
         {
             // You can create an if check for if the ghost is in frightened state from the GhostBehavior script here!!! :)
-            FindObjectOfType<GameManager>().PacmanEaten();
+            if (behaviorScript.currentBehavior == GhostBehavior.CurrentBehavior.Frightened)
+            {
+                FindObjectOfType<GameManager>().GhostEaten(this);
+            }
+            else
+            {
+                FindObjectOfType<GameManager>().PacmanEaten();
+            }
         }
     }
 }

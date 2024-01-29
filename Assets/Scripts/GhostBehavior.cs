@@ -1,12 +1,12 @@
 //////////////////////////////////////////////
 //Assignment/Lab/Project: 3D PacMan
-//Name: Shelby Leggott
+//Name: Shelby Leggott, Greyson Perrin
 //Section: SGD285.4171
 //Instructor: Aurore Locklear
-//Date: 01/21/2024
+//Date: 01/28/2024
 /////////////////////////////////////////////
 
-// GhostBehavior Script: Manages the behaviors for the ghosts (currently has HOME, SCATTER, and CHASE) - MISSING FRIGHTENED AND EATEN STATES
+// GhostBehavior Script: Manages the behaviors for the ghosts (currently has HOME, SCATTER, FRIGHTENED and CHASE) - MISSING EATEN STATE
 
 using System.Collections;
 using System.Collections.Generic;
@@ -42,6 +42,7 @@ public class GhostBehavior : MonoBehaviour
         Home,
         Scatter,
         Chase,
+        Frightened,
         LeavingHome
     }
 
@@ -101,7 +102,7 @@ public class GhostBehavior : MonoBehaviour
 
     private void Update()
     {
-        // Set the ghost behavior to either Home, Scatter, or Chase (ghosts start in chase in later rounds of the game but that is not implemented)
+        // Set the ghost behavior to either Home, Scatter, Flee, or Chase (ghosts start in chase in later rounds of the game but that is not implemented)
         if (this.currentBehavior == CurrentBehavior.Home)
         {
             Home();
@@ -113,6 +114,10 @@ public class GhostBehavior : MonoBehaviour
         if (this.currentBehavior == CurrentBehavior.Chase)
         {
             Chase();
+        }
+        if (this.currentBehavior == CurrentBehavior.Frightened)
+        {
+            Frightened();
         }
         if (this.currentBehavior == CurrentBehavior.LeavingHome)
         {
@@ -189,6 +194,14 @@ public class GhostBehavior : MonoBehaviour
                 }
             }
         }
+        ChooseDirection();
+    }
+
+    private void Frightened()
+    {
+        ghostCollider.excludeLayers = ghostLayer;
+
+        ghost.target = FindObjectOfType<Pacman>().transform.position;
         ChooseDirection();
     }
 
@@ -296,18 +309,31 @@ public class GhostBehavior : MonoBehaviour
             
             Vector3 direction = new Vector3(1, 0, 0);
             float minDistance = float.MaxValue;
+            float maxDistance = 0f;
 
             // Checks the distance from the target for each possible direction
             foreach (Vector3 possibleDirection in directionsToMove) 
             {
                 // if going in a certain direction leads to a greater distance from the target, the ghost will not choose that direction to minimize time to get to target
+                // if the ghost is in the frightened state, they instead choose the direction that leads to the greatest distance from the target(pac-man)
                 Vector3 newPosition = ghost.transform.position + new Vector3(possibleDirection.x, 0.0f, possibleDirection.z);
                 float distance = (ghost.target - newPosition).sqrMagnitude;
 
-                if (distance < minDistance) 
+                if (this.currentBehavior == CurrentBehavior.Frightened)
                 {
-                    direction = possibleDirection;
-                    minDistance = distance; // set the new minimum distance to be the one just identified to allow to be checked with the remaining distances
+                    if (distance > maxDistance)
+                    {
+                        direction = possibleDirection;
+                        maxDistance = distance; // set the new maximum distance to be the one just identified to allow to be checked with the remaining distances
+                    }
+                }
+                else
+                {
+                    if (distance < minDistance)
+                    {
+                        direction = possibleDirection;
+                        minDistance = distance; // set the new minimum distance to be the one just identified to allow to be checked with the remaining distances
+                    }
                 }
             }
 
